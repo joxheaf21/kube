@@ -8,7 +8,7 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 sudo apt-get update
 sudo apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}') kubelet kubeadm kubectl
-sudo kubeadm init 
+sudo kubeadm init --feature-gates=CoreDNS=true,DynamicKubeletConfig=true
 
 # point to new cluster
 [[ -d $HOME/.kube ]] && mkdir -p $HOME/.kube || rm -rf $HOME/.kube/*
