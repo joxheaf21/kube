@@ -1,22 +1,21 @@
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo add-apt-repository "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb http://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+sudo bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
 sudo apt-get update
 sudo apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}') kubelet kubeadm kubectl
-sudo kubeadm init --feature-gates=CoreDNS=true,DynamicKubeletConfig=true
+#sudo kubeadm init --feature-gates=CoreDNS=true,DynamicKubeletConfig=true
+kubeadm join --token 5a192d.a9f763f690b37836 10.148.0.2:6443 --discovery-token-ca-cert-hash sha256:30e264b0b1293515c9e9ffb70d61de739e67f958f38effe368ef8546f9857e44
 
 # point to new cluster
-[[ -d $HOME/.kube ]] && mkdir -p $HOME/.kube || rm -rf $HOME/.kube/*
+[[ ! -d $HOME/.kube ]] && mkdir -p $HOME/.kube || rm -rf $HOME/.kube/*
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # admin for heapster and dashboard
-kubectl create -f $HOME/tokens.yaml
+kubectl create -f rbac/tokens.yaml
 kubectl create -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/rbac/heapster-rbac.yaml
 
 # install network
