@@ -6,8 +6,7 @@ sudo add-apt-repository "deb https://download.docker.com/linux/$(. /etc/os-relea
 sudo bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
 sudo apt-get update
 sudo apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}') kubelet kubeadm kubectl
-#sudo kubeadm init --feature-gates=CoreDNS=true,DynamicKubeletConfig=true
-kubeadm join --token 5a192d.a9f763f690b37836 10.148.0.2:6443 --discovery-token-ca-cert-hash sha256:30e264b0b1293515c9e9ffb70d61de739e67f958f38effe368ef8546f9857e44
+sudo kubeadm init --feature-gates=CoreDNS=true,DynamicKubeletConfig=true
 
 # point to new cluster
 [[ ! -d $HOME/.kube ]] && mkdir -p $HOME/.kube || rm -rf $HOME/.kube/*
